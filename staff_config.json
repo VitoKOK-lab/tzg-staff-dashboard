@@ -5,8 +5,10 @@
   "company_targets": {
     "_note": "公司月度業績目標。以近 6 個月均值約 420 萬為基準。",
     "monthly_revenue": 4200000,
-    "monthly_orders": 0,
-    "_note_orders": "訂單數目標填 0 表示不顯示"
+    "monthly_new_customers": 500,
+    "line_members_total": 20000,
+    "line_members_purchased": 7000,
+    "_note_line": "LINE 會員數由主管每月手動更新"
   },
 
   "departments": {
@@ -28,7 +30,8 @@
         "avg_plays": 14000,
         "avg_completion_rate": 0.154,
         "avg_reach": 11500,
-        "monthly_new_followers": 500
+        "monthly_new_followers": 500,
+        "high_play_threshold": 30000
       }
     },
     "sales_cs": {
