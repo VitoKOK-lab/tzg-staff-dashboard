@@ -72,17 +72,26 @@ def get_period_label():
 
 # ── 部門計算：影音內容 ───────────────────────────────────
 def compute_content(period_key):
-    videos = load_json(VIDEO_FILE, {}).get('videos', [])
+    raw = load_json(VIDEO_FILE, {}).get('videos', {})
+    # videos field may be a dict {id: {...}} or a list
+    if isinstance(raw, dict):
+        videos = list(raw.values())
+    elif isinstance(raw, list):
+        videos = raw
+    else:
+        videos = []
+
     if not videos:
         # archive.json fallback
         arc = load_json(BASE.parent / 'meta-dashboard' / 'data' / 'archive.json', {})
-        videos = arc.get('videos', [])
+        arc_raw = arc.get('videos', {})
+        videos = list(arc_raw.values()) if isinstance(arc_raw, dict) else (arc_raw if isinstance(arc_raw, list) else [])
 
     year, month = period_key.split('-')
     prefix = f'{year}-{month}'
 
-    period_vids = [v for v in videos if str(v.get('created_date', '')).startswith(prefix)]
-    all_vids    = videos
+    period_vids = [v for v in videos if isinstance(v, dict) and str(v.get('created_date', '')).startswith(prefix)]
+    all_vids    = [v for v in videos if isinstance(v, dict)]
 
     def safe_avg(lst):
         return sum(lst) / len(lst) if lst else 0
@@ -585,7 +594,7 @@ def render_content(c):
         vtype = v.get('type','')
         type_cls = 'type-traffic' if vtype == 'traffic' else 'type-commerce'
         type_lbl = '流量' if vtype == 'traffic' else '帶貨' if vtype == 'commerce' else vtype
-        cr_val = round(v.get('completion_rate', 0) * 100, 1)
+        cr_val = round((v.get('completion_rate') or 0) * 100, 1)
         vid_rows += f'''<div class="vid-item">
   <div class="vid-rank">{i}</div>
   <div class="vid-info">
