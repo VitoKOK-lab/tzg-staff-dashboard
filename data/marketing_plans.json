@@ -1,0 +1,41 @@
+{
+  "_note": "行銷企劃月度/週計劃填報。執行「填報計劃.command」進行填寫。",
+  "2026-05": {
+    "monthly": {
+      "goals": [
+        "5月母親節活動企劃執行",
+        "品牌形象影片腳本完成",
+        "新品系列上市行銷計劃",
+        "季度廣告預算規劃"
+      ],
+      "completed": [false, false, false, false],
+      "notes": ""
+    },
+    "weeks": {
+      "W1": {
+        "label": "5/1–5/7",
+        "tasks": ["母親節文案撰寫", "社群排程設定", "廣告素材出稿", "競品分析報告", "週會簡報"],
+        "done": [false, false, false, false, false],
+        "review": ""
+      },
+      "W2": {
+        "label": "5/8–5/14",
+        "tasks": ["活動上線監控", "廣告成效回報", "KOL 聯繫跟進", "EDM 發送", "週會簡報"],
+        "done": [false, false, false, false, false],
+        "review": ""
+      },
+      "W3": {
+        "label": "5/15–5/21",
+        "tasks": ["活動成效分析", "新品拍攝協調", "下月企劃草案", "社群互動回應", "週會簡報"],
+        "done": [false, false, false, false, false],
+        "review": ""
+      },
+      "W4": {
+        "label": "5/22–5/31",
+        "tasks": ["月度報告撰寫", "6月計劃定稿", "品牌素材整理", "供應商對接", "月會簡報"],
+        "done": [false, false, false, false, false],
+        "review": ""
+      }
+    }
+  }
+}

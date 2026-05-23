@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.tzg.staff.daily</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-c</string>
+    <string>cd /Users/vito/Documents/AIcode-claude/tzg-staff-dashboard && pip3 install -q -r requirements.txt && python3 generate_staff.py && git add output/staff_latest.html && git commit -m "auto: staff dashboard $(date '+%Y-%m-%d')" && git push origin main</string>
+  </array>
+
+  <!-- 每天 08:30 自動執行（與日報 LaunchAgent 時間錯開）-->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>8</integer>
+    <key>Minute</key>
+    <integer>30</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/tzg-staff-daily.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/tzg-staff-daily.err</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

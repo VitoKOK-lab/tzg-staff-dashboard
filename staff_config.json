@@ -1,0 +1,47 @@
+{
+  "_note": "TZG 員工績效設定檔。修改後執行 產生報表.command 重新產生頁面。",
+  "company": "泰熙爾札娜珠寶",
+
+  "departments": {
+    "marketing": {
+      "name": "行銷企劃",
+      "color": "#C94070",
+      "kpi_targets": {
+        "monthly_goal_count": 4,
+        "weekly_task_count": 5,
+        "completion_rate_target": 0.8
+      }
+    },
+    "content": {
+      "name": "影音內容",
+      "color": "#0ABAB5",
+      "kpi_targets": {
+        "monthly_video_count": 12,
+        "avg_completion_rate": 0.15,
+        "avg_plays": 3000,
+        "monthly_new_followers": 500
+      }
+    },
+    "sales_cs": {
+      "name": "銷售客服",
+      "color": "#B8892A",
+      "kpi_targets": {
+        "response_score_target": 85,
+        "max_complaints_per_month": 2,
+        "complaint_deduction_each": 10
+      }
+    }
+  },
+
+  "bonus_reference": {
+    "_note": "主管參考用，最終金額手動核定",
+    "quarterly_base_each_dept": 0,
+    "annual_base_each_dept": 0,
+    "tiers": [
+      { "min_score": 90, "label": "卓越",  "note": "全額季獎 + 年終加成" },
+      { "min_score": 75, "label": "達標",  "note": "全額季獎" },
+      { "min_score": 60, "label": "待改善","note": "半額季獎" },
+      { "min_score": 0,  "label": "不符標準","note": "不發季獎" }
+    ]
+  }
+}

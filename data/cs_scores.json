@@ -1,0 +1,33 @@
+{
+  "_note": "銷售客服月度評分。每月由主管手動填入，執行「填報計劃.command」進行填寫。",
+  "2026-05": {
+    "members": [
+      {
+        "name": "客服A",
+        "response_score": 88,
+        "response_note": "平均回覆時間 12 分鐘",
+        "complaints": 1,
+        "complaint_details": ["2026-05-10 客戶反映出貨延遲未主動通知"],
+        "deduction": 10,
+        "bonus_note": "",
+        "final_score": 78
+      },
+      {
+        "name": "客服B",
+        "response_score": 95,
+        "response_note": "平均回覆時間 6 分鐘，主動追蹤出貨",
+        "complaints": 0,
+        "complaint_details": [],
+        "deduction": 0,
+        "bonus_note": "本月新客轉換優異",
+        "final_score": 95
+      }
+    ],
+    "scoring_rules": {
+      "response_score_weight": 0.7,
+      "complaint_deduction_each": 10,
+      "max_score": 100
+    },
+    "manager_notes": ""
+  }
+}
