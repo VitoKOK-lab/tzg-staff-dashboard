@@ -2,6 +2,13 @@
   "_note": "TZG 員工績效設定檔。修改後執行 產生報表.command 重新產生頁面。",
   "company": "泰熙爾札娜珠寶",
 
+  "company_targets": {
+    "_note": "公司月度業績目標。以近 6 個月均值約 420 萬為基準。",
+    "monthly_revenue": 4200000,
+    "monthly_orders": 0,
+    "_note_orders": "訂單數目標填 0 表示不顯示"
+  },
+
   "departments": {
     "marketing": {
       "name": "行銷企劃",
@@ -15,10 +22,12 @@
     "content": {
       "name": "影音內容",
       "color": "#0ABAB5",
+      "_note": "基準值來自全部影片實際均值 (2026-05-23)",
       "kpi_targets": {
         "monthly_video_count": 12,
-        "avg_completion_rate": 0.15,
-        "avg_plays": 3000,
+        "avg_plays": 14000,
+        "avg_completion_rate": 0.154,
+        "avg_reach": 11500,
         "monthly_new_followers": 500
       }
     },

@@ -134,6 +134,65 @@ def compute_content(period_key):
         'recent': recent,
     }
 
+# ── 公司業績：讀訂單月營收 ───────────────────────────────
+def compute_revenue(period_key):
+    """從訂單 CSV/XLS 算出本月營收，並與 staff_config 目標比較。
+    使用 pandas（與 generate_daily.py 相同邏輯），去重後計算。"""
+    cfg = load_json(STAFF_CFG)
+    target = cfg.get('company_targets', {}).get('monthly_revenue', 0)
+
+    try:
+        import pandas as pd
+    except ImportError:
+        print('[WARN] pandas 未安裝，跳過營收計算')
+        return {'revenue': 0, 'orders': 0, 'target': int(target), 'rate': 0}
+
+    year, month = period_key.split('-')
+    prefix = f'{year}-{month}'
+    dfs = []
+
+    # CSV files
+    for f in sorted(TZG_DATA.glob('*.csv')):
+        try:
+            df = pd.read_csv(f, encoding='utf-8-sig', low_memory=False,
+                             usecols=lambda c: c in ('訂單號碼', '訂單日期', '訂單合計', '訂單狀態'))
+            dfs.append(df)
+        except Exception:
+            pass
+
+    # XLS / XLSX files (Shopline format, xlrd or openpyxl)
+    for f in sorted(TZG_DATA.glob('*.xls')) + sorted(TZG_DATA.glob('*.xlsx')):
+        try:
+            df = pd.read_excel(f, usecols=lambda c: c in ('訂單號碼', '訂單日期', '訂單合計', '訂單狀態'))
+            dfs.append(df)
+        except Exception:
+            pass
+
+    if not dfs:
+        return {'revenue': 0, 'orders': 0, 'target': int(target), 'rate': 0}
+
+    df = pd.concat(dfs, ignore_index=True)
+
+    # 去重（同一訂單在多個檔案中重複出現）
+    df = df.drop_duplicates(subset='訂單號碼')
+
+    # 過濾本期
+    df['訂單日期'] = pd.to_datetime(df['訂單日期'], errors='coerce')
+    mask = df['訂單日期'].dt.to_period('M').astype(str) == period_key
+    df_period = df[mask].copy()
+
+    df_period['訂單合計'] = pd.to_numeric(df_period['訂單合計'], errors='coerce').fillna(0)
+    total = float(df_period['訂單合計'].sum())
+    orders = int(len(df_period))
+
+    rate = round(total / target * 100) if target else 0
+    return {
+        'revenue': int(total),
+        'orders': orders,
+        'target': int(target),
+        'rate': rate,
+    }
+
 # ── 部門計算：行銷企劃 ───────────────────────────────────
 def compute_marketing(period_key):
     plans = load_json(MKT_PLANS, {})
@@ -252,7 +311,7 @@ def num_fmt(n):
     if n >= 1000:  return f'{n/1000:.1f}K'
     return str(n)
 
-def render(mkt, content, cs, period_key, period_label):
+def render(mkt, content, cs, revenue, period_key, period_label):
     cfg = load_json(STAFF_CFG)
     depts = cfg.get('departments', {})
 
@@ -437,12 +496,15 @@ table.bonus-tbl td{{font-size:12px;padding:10px 8px;border-top:1px solid var(--b
 <!-- ── 總覽 ── -->
 <div class="dept-section on" id="sec-overview">
 
-  <div class="sec-title" style="margin-top:20px">本月部門綜合分數</div>
+  <div class="sec-title" style="margin-top:20px">本月公司業績</div>
+  {render_revenue_card(revenue)}
+
+  <div class="sec-title">本月部門綜合分數</div>
   <div class="summary-bar">
     <div class="sum-card c-mkt">
-      <div class="sum-score" style="color:{pct_color(mkt_score)}">{mkt_score}</div>
+      <div class="sum-score" style="color:{pct_color(mkt_score)}">{mkt_score if mkt['monthly_total'] > 0 else '—'}</div>
       <div class="sum-name">行銷企劃</div>
-      <div class="sum-tier" style="color:{pct_color(mkt_score)}">任務完成率</div>
+      <div class="sum-tier" style="color:{pct_color(mkt_score)}">{'任務完成率' if mkt['monthly_total'] > 0 else '尚未填報'}</div>
     </div>
     <div class="sum-card c-cnt">
       <div class="sum-score" style="color:{pct_color(content_score)}">{content_score}</div>
@@ -450,9 +512,9 @@ table.bonus-tbl td{{font-size:12px;padding:10px 8px;border-top:1px solid var(--b
       <div class="sum-tier" style="color:{pct_color(content_score)}">綜合指標</div>
     </div>
     <div class="sum-card c-cs">
-      <div class="sum-score" style="color:{pct_color(cs_score)}">{cs_score}</div>
+      <div class="sum-score" style="color:{pct_color(cs_score)}">{cs_score if cs['members'] else '—'}</div>
       <div class="sum-name">銷售客服</div>
-      <div class="sum-tier" style="color:{pct_color(cs_score)}">平均服務分</div>
+      <div class="sum-tier" style="color:{pct_color(cs_score)}">{'平均服務分' if cs['members'] else '尚未填報'}</div>
     </div>
   </div>
 
@@ -495,6 +557,31 @@ function showDept(id) {{
 
 # ── 子區塊渲染 ──────────────────────────────────────────
 
+def render_revenue_card(rev):
+    r = rev['rate']
+    actual = rev['revenue']
+    target = rev['target']
+    color = pct_color(r, good=80)
+    if not target:
+        return '<div style="color:var(--dim);font-size:13px;padding:10px 0 4px">尚未設定業績目標（請在 staff_config.json 中填入 company_targets.monthly_revenue）</div>'
+    bar_w = min(r, 100)
+    bar_color = color
+    diff = actual - target
+    diff_str = (f'+{diff/10000:.1f}萬' if diff >= 0 else f'-{abs(diff)/10000:.1f}萬')
+    diff_color = '#0ABAB5' if diff >= 0 else '#C94070'
+    return f'''<div style="background:var(--bg);border:1px solid var(--bdr);border-radius:14px;padding:20px 24px;margin-bottom:8px">
+  <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:12px">
+    <div style="font-family:var(--serif);font-size:32px;font-weight:600;color:{color};line-height:1">{actual/10000:.1f}<span style="font-size:14px;font-weight:400;margin-left:2px">萬</span></div>
+    <div style="font-size:12px;color:var(--dim);padding-bottom:4px">/ 目標 {target/10000:.0f}萬</div>
+    <div style="font-size:13px;font-weight:700;color:{diff_color};padding-bottom:4px;margin-left:auto">{diff_str}</div>
+    <div style="font-size:22px;font-weight:700;color:{color};padding-bottom:2px">{r}%</div>
+  </div>
+  <div style="background:var(--bg2);border-radius:99px;height:6px;overflow:hidden">
+    <div style="width:{bar_w}%;height:100%;background:{bar_color};border-radius:99px;transition:width .6s"></div>
+  </div>
+  <div style="margin-top:8px;font-size:11px;color:var(--dim)">本月訂單數 {rev["orders"]} 筆</div>
+</div>'''
+
 def render_bonus_table(mkt_score, content_score, cs_score, cfg):
     tiers = cfg.get('bonus_reference', {}).get('tiers', [])
     def tier_label(score):
@@ -528,6 +615,15 @@ def render_bonus_table(mkt_score, content_score, cs_score, cfg):
 </div>'''
 
 def render_marketing(mkt):
+    # Empty state — no plans entered yet
+    if mkt['monthly_total'] == 0 and not mkt['weeks']:
+        return '''
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;color:var(--dim)">
+  <div style="font-size:36px;margin-bottom:16px">📋</div>
+  <div style="font-size:16px;font-weight:600;color:var(--sub);margin-bottom:8px">尚未填報本月計劃</div>
+  <div style="font-size:13px;line-height:1.7">雙擊「填報計劃.command」<br>即可填入本月目標與週任務</div>
+</div>'''
+
     goal_items = ''
     for g, c in zip(mkt['goals'], mkt['completed']):
         cls = 'done' if c else 'pend'
@@ -734,8 +830,9 @@ def main():
     mkt     = compute_marketing(period_key)
     content = compute_content(period_key)
     cs      = compute_sales_cs(period_key)
+    revenue = compute_revenue(period_key)
 
-    html = render(mkt, content, cs, period_key, period_label)
+    html = render(mkt, content, cs, revenue, period_key, period_label)
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(html, encoding='utf-8')
@@ -743,6 +840,7 @@ def main():
     print(f'  行銷企劃完成率：{mkt["overall_rate"]}%')
     print(f'  影音內容發片數：{content["count"]}')
     print(f'  客服平均分：{cs["avg_score"]}')
+    print(f'  本月營收：{revenue["revenue"]:,} / 目標 {revenue["target"]:,} ({revenue["rate"]}%)')
 
 if __name__ == '__main__':
     main()
