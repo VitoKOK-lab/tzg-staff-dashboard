@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TZG 部門績效 2026 年 05 月</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#B8892A; --gold2:#C9A961; --goldsoft:#f3ebd4;
+  --pink:#C94070; --pinksoft:#fce4ec;
+  --tiff:#0ABAB5; --tiff2:#4DD0CB; --tiffsoft:#d6f3f1;
+  --text:#1a1a1a; --sub:#555; --dim:#999;
+  --bg:#fff; --bg1:#fafaf7; --bg2:#f5f3ef; --bdr:rgba(0,0,0,.08);
+  --serif:'Cormorant Garamond',serif;
+  --sans:'Montserrat','PingFang TC',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--sans);background:var(--bg1);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* ── HEADER ── */
+.hdr{background:var(--bg);border-bottom:1px solid var(--bdr);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:50}
+.hdr-brand{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:.2em;color:var(--gold);flex-shrink:0}
+.hdr-title{font-size:12px;font-weight:600;color:var(--sub);flex:1}
+.hdr-date{font-size:10px;color:var(--dim)}
+
+/* ── DEPT TABS ── */
+.dept-tabs{display:flex;background:var(--bg);border-bottom:1px solid var(--bdr);padding:0 24px;gap:2px}
+.dtab{padding:11px 18px;font-size:12px;font-weight:600;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;transition:color .14s,border-color .14s;white-space:nowrap;user-select:none}
+.dtab:hover{color:var(--pink)}
+.dtab.on{color:var(--pink);border-bottom-color:var(--pink)}
+
+/* ── PERIOD TABS ── */
+.period-bar{display:flex;align-items:center;gap:8px;padding:14px 24px 0}
+.period-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.ptab{padding:4px 12px;font-size:11px;font-weight:600;border-radius:20px;cursor:pointer;border:1px solid var(--bdr);color:var(--dim);background:none;transition:all .13s}
+.ptab.on{background:var(--pink);color:#fff;border-color:var(--pink)}
+
+/* ── CONTENT ── */
+.content{padding:20px 24px 60px;max-width:1100px;margin:0 auto}
+.dept-section{display:none}.dept-section.on{display:block}
+
+/* ── OVERVIEW CARDS ── */
+.overview-row{display:flex;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+.ov-card{flex:1;min-width:160px;background:var(--bg);border:1px solid var(--bdr);border-radius:14px;padding:20px;text-align:center}
+.ov-num{font-family:var(--serif);font-size:36px;font-weight:600;line-height:1}
+.ov-label{font-size:11px;color:var(--dim);margin-top:5px;letter-spacing:.05em}
+.ov-sub{font-size:10px;color:var(--dim);margin-top:3px}
+
+/* ── SECTION TITLE ── */
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin:24px 0 12px}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.kpi-card{background:var(--bg);border:1px solid var(--bdr);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-gold::before{background:var(--gold)}
+.kpi-pink::before{background:var(--pink)}
+.kpi-tiff::before{background:var(--tiff)}
+.kpi-val{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--text);line-height:1}
+.kpi-label{font-size:10.5px;color:var(--dim);margin-top:4px}
+.kpi-target{font-size:10px;color:var(--dim);margin-top:2px}
+.kpi-bar-wrap{margin-top:8px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.kpi-bar{height:100%;border-radius:2px;transition:width .4s}
+
+/* ── RING ROW ── */
+.ring-row{display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:24px}
+.ring-item{text-align:center}
+.ring-item-label{font-size:11px;color:var(--sub);margin-top:6px;font-weight:600}
+.ring-item-sub{font-size:10px;color:var(--dim)}
+
+/* ── GOAL LIST ── */
+.goal-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.goal-item{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px}
+.goal-cb{width:18px;height:18px;border-radius:5px;border:2px solid var(--bdr);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px}
+.goal-cb.done{background:var(--tiff);border-color:var(--tiff);color:#fff}
+.goal-cb.pend{background:var(--bg2);color:transparent}
+.goal-text{font-size:13px;color:var(--text);flex:1}
+.goal-text.done{color:var(--dim);text-decoration:line-through}
+
+/* ── WEEK CARD ── */
+.week-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:24px}
+.week-card{background:var(--bg);border:1px solid var(--bdr);border-radius:12px;padding:16px}
+.wk-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.wk-title{font-size:12px;font-weight:700;color:var(--sub)}
+.wk-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.wk-task{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--bg2)}
+.wk-task:last-child{border:none}
+.wk-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.wk-dot.done{background:var(--tiff)}
+.wk-dot.pend{background:var(--bdr)}
+.wk-task-text{font-size:11.5px;color:var(--sub)}
+.wk-task-text.done{color:var(--dim);text-decoration:line-through}
+
+/* ── VIDEO LIST ── */
+.vid-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.vid-item{display:flex;gap:12px;align-items:center;background:var(--bg);border:1px solid var(--bdr);border-radius:10px;padding:12px 14px}
+.vid-rank{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--dim);width:24px;flex-shrink:0}
+.vid-info{flex:1;min-width:0}
+.vid-title{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vid-meta{font-size:10px;color:var(--dim);margin-top:3px}
+.vid-plays{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--gold);white-space:nowrap}
+.vid-type{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;flex-shrink:0}
+.type-traffic{background:var(--tiffsoft);color:var(--tiff)}
+.type-commerce{background:var(--pinksoft);color:var(--pink)}
+
+/* ── CS MEMBER CARDS ── */
+.cs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:24px}
+.cs-card{background:var(--bg);border:1px solid var(--bdr);border-radius:14px;padding:20px;position:relative}
+.cs-rank-badge{position:absolute;top:14px;right:14px;font-family:var(--serif);font-size:22px;font-weight:600;color:var(--bdr)}
+.cs-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px}
+.cs-score-row{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
+.cs-score-big{font-family:var(--serif);font-size:42px;font-weight:600;line-height:1}
+.cs-score-label{font-size:11px;color:var(--dim)}
+.cs-bar-wrap{height:5px;background:var(--bg2);border-radius:3px;margin-bottom:12px;overflow:hidden}
+.cs-bar{height:100%;border-radius:3px}
+.cs-detail{font-size:11px;color:var(--sub);line-height:1.7}
+.cs-complaint{margin-top:8px;padding:8px 10px;background:var(--pinksoft);border-radius:8px;font-size:11px;color:var(--pink)}
+.cs-bonus{margin-top:8px;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700}
+.cs-bonus-ok{background:var(--tiffsoft);color:var(--tiff)}
+.cs-bonus-warn{background:var(--goldsoft);color:var(--gold)}
+.cs-bonus-fail{background:var(--pinksoft);color:var(--pink)}
+
+/* ── SUMMARY SCORE ── */
+.summary-bar{display:flex;gap:14px;margin-bottom:28px;flex-wrap:wrap}
+.sum-card{flex:1;min-width:140px;background:var(--bg);border:1px solid var(--bdr);border-radius:14px;padding:18px;text-align:center;border-top:3px solid transparent}
+.sum-card.c-mkt{border-top-color:var(--pink)}
+.sum-card.c-cnt{border-top-color:var(--tiff)}
+.sum-card.c-cs{border-top-color:var(--gold)}
+.sum-score{font-family:var(--serif);font-size:40px;font-weight:600;line-height:1}
+.sum-name{font-size:11px;color:var(--dim);margin-top:5px}
+.sum-tier{font-size:10px;font-weight:700;margin-top:4px}
+
+/* ── BONUS TABLE ── */
+.bonus-section{background:var(--bg);border:1px solid var(--bdr);border-radius:14px;padding:20px;margin-bottom:24px}
+.bonus-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.bonus-title::before{content:'';display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--goldsoft);border:1px solid var(--gold)}
+.bonus-note{font-size:11px;color:var(--dim);margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr)}
+table.bonus-tbl{width:100%;border-collapse:collapse}
+table.bonus-tbl th{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:0 8px 10px;text-align:left}
+table.bonus-tbl td{font-size:12px;padding:10px 8px;border-top:1px solid var(--bg2);vertical-align:middle}
+
+@media(max-width:600px){
+  .hdr{padding:12px 16px}
+  .content{padding:14px 16px 60px}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .overview-row{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-brand">TZG</div>
+  <div class="hdr-title">部門績效儀表板 · 2026 年 05 月</div>
+  <div class="hdr-date">更新：2026/05/23 15:37</div>
+</div>
+
+<div class="dept-tabs">
+  <div class="dtab on" onclick="showDept('overview')">總覽</div>
+  <div class="dtab" onclick="showDept('marketing')">行銷企劃</div>
+  <div class="dtab" onclick="showDept('content')">影音內容</div>
+  <div class="dtab" onclick="showDept('sales_cs')">銷售客服</div>
+</div>
+
+<div class="content">
+
+<!-- ── 總覽 ── -->
+<div class="dept-section on" id="sec-overview">
+
+  <div class="sec-title" style="margin-top:20px">本月部門綜合分數</div>
+  <div class="summary-bar">
+    <div class="sum-card c-mkt">
+      <div class="sum-score" style="color:#C94070">0</div>
+      <div class="sum-name">行銷企劃</div>
+      <div class="sum-tier" style="color:#C94070">任務完成率</div>
+    </div>
+    <div class="sum-card c-cnt">
+      <div class="sum-score" style="color:#0ABAB5">100</div>
+      <div class="sum-name">影音內容</div>
+      <div class="sum-tier" style="color:#0ABAB5">綜合指標</div>
+    </div>
+    <div class="sum-card c-cs">
+      <div class="sum-score" style="color:#0ABAB5">86</div>
+      <div class="sum-name">銷售客服</div>
+      <div class="sum-tier" style="color:#0ABAB5">平均服務分</div>
+    </div>
+  </div>
+
+  <div class="sec-title">獎金參考試算</div>
+  <div class="bonus-section">
+  <div class="bonus-title">季/年終獎金參考（主管核定用）</div>
+  <table class="bonus-tbl">
+    <tr>
+      <th>部門</th><th>本月分數</th><th>等級</th><th>建議</th><th>實際金額</th>
+    </tr>
+    <tr>
+          <td style="font-weight:700">行銷企劃</td>
+          <td><span style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--pink)">0</span></td>
+          <td><span style="font-weight:700;color:var(--pink)">不符標準</span></td>
+          <td style="color:var(--dim)">不發季獎</td>
+          <td style="color:var(--dim)">主管核定後填入</td>
+        </tr><tr>
+          <td style="font-weight:700">影音內容</td>
+          <td><span style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--tiff)">100</span></td>
+          <td><span style="font-weight:700;color:var(--tiff)">卓越</span></td>
+          <td style="color:var(--dim)">全額季獎 + 年終加成</td>
+          <td style="color:var(--dim)">主管核定後填入</td>
+        </tr><tr>
+          <td style="font-weight:700">銷售客服</td>
+          <td><span style="font-family:var(--serif);font-size:22px;font-weight:600;color:var(--gold)">86</span></td>
+          <td><span style="font-weight:700;color:var(--gold)">達標</span></td>
+          <td style="color:var(--dim)">全額季獎</td>
+          <td style="color:var(--dim)">主管核定後填入</td>
+        </tr>
+  </table>
+  <div class="bonus-note">⚠️ 以上為系統依 KPI 達成率自動試算，最終獎金金額由主管審閱後手動核定。</div>
+</div>
+
+</div>
+
+<!-- ── 行銷企劃 ── -->
+<div class="dept-section" id="sec-marketing">
+  
+<div class="overview-row" style="margin-top:20px">
+  <div class="ov-card">
+    <div class="ov-num" style="color:#C94070">0%</div>
+    <div class="ov-label">月度目標完成率</div>
+    <div class="ov-sub">0/4 項完成</div>
+  </div>
+  <div class="ov-card">
+    <div class="ov-num" style="color:#C94070">0%</div>
+    <div class="ov-label">週任務完成率</div>
+    <div class="ov-sub">0/20 任務</div>
+  </div>
+  <div class="ov-card">
+    <div class="ov-num" style="color:var(--gold)">80%</div>
+    <div class="ov-label">目標達成率</div>
+    <div class="ov-sub">本月目標</div>
+  </div>
+</div>
+
+<div class="sec-title">月度目標</div>
+<div class="goal-list"><div class="goal-item"><div class="goal-cb pend"></div><div class="goal-text ">5月母親節活動企劃執行</div></div><div class="goal-item"><div class="goal-cb pend"></div><div class="goal-text ">品牌形象影片腳本完成</div></div><div class="goal-item"><div class="goal-cb pend"></div><div class="goal-text ">新品系列上市行銷計劃</div></div><div class="goal-item"><div class="goal-cb pend"></div><div class="goal-text ">季度廣告預算規劃</div></div></div>
+
+<div class="sec-title">週任務進度</div>
+<div class="week-cards"><div class="week-card">
+  <div class="wk-hdr">
+    <div class="wk-title">5/1–5/7</div>
+    <div class="wk-badge" style="background:#fce4ec;color:#C94070">0/5 · 0%</div>
+  </div>
+  <div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">母親節文案撰寫</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">社群排程設定</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">廣告素材出稿</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">競品分析報告</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">週會簡報</div></div>
+</div><div class="week-card">
+  <div class="wk-hdr">
+    <div class="wk-title">5/8–5/14</div>
+    <div class="wk-badge" style="background:#fce4ec;color:#C94070">0/5 · 0%</div>
+  </div>
+  <div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">活動上線監控</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">廣告成效回報</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">KOL 聯繫跟進</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">EDM 發送</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">週會簡報</div></div>
+</div><div class="week-card">
+  <div class="wk-hdr">
+    <div class="wk-title">5/15–5/21</div>
+    <div class="wk-badge" style="background:#fce4ec;color:#C94070">0/5 · 0%</div>
+  </div>
+  <div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">活動成效分析</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">新品拍攝協調</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">下月企劃草案</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">社群互動回應</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">週會簡報</div></div>
+</div><div class="week-card">
+  <div class="wk-hdr">
+    <div class="wk-title">5/22–5/31</div>
+    <div class="wk-badge" style="background:#fce4ec;color:#C94070">0/5 · 0%</div>
+  </div>
+  <div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">月度報告撰寫</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">6月計劃定稿</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">品牌素材整理</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">供應商對接</div></div><div class="wk-task"><div class="wk-dot pend"></div><div class="wk-task-text ">月會簡報</div></div>
+</div></div>
+
+</div>
+
+<!-- ── 影音內容 ── -->
+<div class="dept-section" id="sec-content">
+  
+<div class="overview-row" style="margin-top:20px">
+  <div class="ov-card">
+    <div class="ov-num" style="color:#0ABAB5">163</div>
+    <div class="ov-label">本月發片數</div>
+    <div class="ov-sub">目標 12 支</div>
+  </div>
+  <div class="ov-card">
+    <div class="ov-num" style="color:#0ABAB5">1.1萬</div>
+    <div class="ov-label">平均播放</div>
+    <div class="ov-sub">目標 3.0K</div>
+  </div>
+  <div class="ov-card">
+    <div class="ov-num" style="color:#0ABAB5">16.3%</div>
+    <div class="ov-label">平均完播率</div>
+    <div class="ov-sub">目標 15.0%</div>
+  </div>
+  <div class="ov-card">
+    <div class="ov-num" style="color:#0ABAB5">864</div>
+    <div class="ov-label">新增粉絲</div>
+    <div class="ov-sub">目標 500</div>
+  </div>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card kpi-tiff">
+    <div class="kpi-val">156.5萬</div>
+    <div class="kpi-label">總觸及人數</div>
+  </div>
+  <div class="kpi-card kpi-pink">
+    <div class="kpi-val">2.6%</div>
+    <div class="kpi-label">互動率</div>
+    <div class="kpi-target">（讚+留言+分享）/ 觸及</div>
+  </div>
+  <div class="kpi-card kpi-gold">
+    <div class="kpi-val">90</div>
+    <div class="kpi-label">流量型影片</div>
+    <div class="kpi-target">佔比 55%</div>
+  </div>
+  <div class="kpi-card kpi-pink">
+    <div class="kpi-val">73</div>
+    <div class="kpi-label">帶貨型影片</div>
+    <div class="kpi-target">佔比 45%</div>
+  </div>
+</div>
+
+<div class="sec-title">本月高播放影片 Top 8</div>
+<div class="vid-list"><div class="vid-item">
+  <div class="vid-rank">1</div>
+  <div class="vid-info">
+    <div class="vid-title">用美琪肥皂就可以試試925銀真假！
+#首頁連結加入溱姐寵粉社群 #銀飾品</div>
+    <div class="vid-meta">完播 23.9%・觸及 11.9萬・讚 3.0K</div>
+  </div>
+  <div class="vid-type type-traffic">流量</div>
+  <div class="vid-plays">12.4萬</div>
+</div><div class="vid-item">
+  <div class="vid-rank">2</div>
+  <div class="vid-info">
+    <div class="vid-title">外國人 第一次 到用筷子的國家 ⋯
+
+#首頁連結加入溱姐寵粉社群 #外國人在台灣 #異國婚姻</div>
+    <div class="vid-meta">完播 65.4%・觸及 12.0萬・讚 1.6K</div>
+  </div>
+  <div class="vid-type type-traffic">流量</div>
+  <div class="vid-plays">11.6萬</div>
+</div><div class="vid-item">
+  <div class="vid-rank">3</div>
+  <div class="vid-info">
+    <div class="vid-title">記住這個配戴法則
+能讓水晶能量發揮最大作用！
+#首頁鏈接加入溱姐寵粉社區 #珠寶#水晶佩戴＃珠寶知識</div>
+    <div class="vid-meta">完播 15.5%・觸及 6.2萬・讚 939</div>
+  </div>
+  <div class="vid-type type-traffic">流量</div>
+  <div class="vid-plays">6.5萬</div>
+</div><div class="vid-item">
+  <div class="vid-rank">4</div>
+  <div class="vid-info">
+    <div class="vid-title">天使陪伴我左右
+這是一個傷心的故事⋯
+但也成為我持續的動力
+
+#用加盟奶茶店的錢讓你輕鬆入局成為珠寶…</div>
+    <div class="vid-meta">完播 0%・觸及 2.5萬・讚 1.1K</div>
+  </div>
+  <div class="vid-type type-traffic">流量</div>
+  <div class="vid-plays">4.6萬</div>
+</div><div class="vid-item">
+  <div class="vid-rank">5</div>
+  <div class="vid-info">
+    <div class="vid-title">你看了Prada惡魔的第二集嗎？ 
+手握3,000,000的珠寶女王秘密藏在這三件平地裡！
+職場女性…</div>
+    <div class="vid-meta">完播 6.5%・觸及 4.4萬・讚 682</div>
+  </div>
+  <div class="vid-type type-commerce">帶貨</div>
+  <div class="vid-plays">4.4萬</div>
+</div><div class="vid-item">
+  <div class="vid-rank">6</div>
+  <div class="vid-info">
+    <div class="vid-title">這三種水晶不要買，都是假的
+趕快看一下 你的水晶有沒有 蛛網紋！
+#首頁連結加入溱姐寵粉社群
+#水晶…</div>
+    <div class="vid-meta">完播 14.4%・觸及 4.2萬・讚 724</div>
+  </div>
+  <div class="vid-type type-traffic">流量</div>
+  <div class="vid-plays">4.1萬</div>
+</div><div class="vid-item">
+  <div class="vid-rank">7</div>
+  <div class="vid-info">
+    <div class="vid-title">外國人 第一次 到用筷子的國家 ⋯
+
+#首頁連結加入溱姐寵粉社群 #外國人在台灣 #異國婚姻</div>
+    <div class="vid-meta">完播 0%・觸及 2.3萬・讚 678</div>
+  </div>
+  <div class="vid-type type-traffic">流量</div>
+  <div class="vid-plays">4.0萬</div>
+</div><div class="vid-item">
+  <div class="vid-rank">8</div>
+  <div class="vid-info">
+    <div class="vid-title">一夫多妻+近親結婚
+兩個奇特的婚姻文化 你能接受嗎？
+
+到底是為什麼造成這樣的現象嗎？
+將近18年的…</div>
+    <div class="vid-meta">完播 12.4%・觸及 5.1萬・讚 229</div>
+  </div>
+  <div class="vid-type type-traffic">流量</div>
+  <div class="vid-plays">3.8萬</div>
+</div></div>
+
+</div>
+
+<!-- ── 銷售客服 ── -->
+<div class="dept-section" id="sec-sales_cs">
+  
+<div class="overview-row" style="margin-top:20px">
+  <div class="ov-card">
+    <div class="ov-num" style="color:#0ABAB5">86.5</div>
+    <div class="ov-label">平均服務分</div>
+    <div class="ov-sub">目標 85 分</div>
+  </div>
+  <div class="ov-card">
+    <div class="ov-num" style="color:var(--tiff)">1</div>
+    <div class="ov-label">本月客訴總數</div>
+    <div class="ov-sub">上限 2 件</div>
+  </div>
+  <div class="ov-card">
+    <div class="ov-num">2</div>
+    <div class="ov-label">評分人員數</div>
+  </div>
+</div>
+
+<div class="sec-title">客服人員評分排行（全員公開）</div>
+<div class="cs-grid"><div class="cs-card">
+  <div class="cs-rank-badge">#1</div>
+  <div class="cs-name">客服B</div>
+  <div class="cs-score-row">
+    <div class="cs-score-big" style="color:#0ABAB5">95</div>
+    <div class="cs-score-label">/ 100 分</div>
+  </div>
+  <div class="cs-bar-wrap"><div class="cs-bar" style="width:95%;background:#0ABAB5"></div></div>
+  <div class="cs-detail">
+    回覆評分：95<br>
+    平均回覆時間 6 分鐘，主動追蹤出貨
+  </div>
+  <div class="cs-bonus cs-bonus-ok">卓越｜全額季獎 + 年終加成</div><div style="margin-top:6px;font-size:10.5px;color:var(--tiff)">💡 本月新客轉換優異</div>
+</div><div class="cs-card">
+  <div class="cs-rank-badge">#2</div>
+  <div class="cs-name">客服A</div>
+  <div class="cs-score-row">
+    <div class="cs-score-big" style="color:#B8892A">78</div>
+    <div class="cs-score-label">/ 100 分</div>
+  </div>
+  <div class="cs-bar-wrap"><div class="cs-bar" style="width:78%;background:#B8892A"></div></div>
+  <div class="cs-detail">
+    回覆評分：88<br>
+    平均回覆時間 12 分鐘
+  </div>
+  <div class="cs-complaint">⚠️ 客訴 1 件（扣 10 分）<br><span style="opacity:.7">2026-05-10 客戶反映出貨延遲未主動通知</span></div><div class="cs-bonus cs-bonus-ok">達標｜全額季獎</div>
+</div></div>
+
+
+</div>
+
+</div><!-- /content -->
+
+<script>
+function showDept(id) {
+  document.querySelectorAll('.dtab').forEach((t,i) => {
+    const ids = ['overview','marketing','content','sales_cs'];
+    t.classList.toggle('on', ids[i] === id);
+  });
+  document.querySelectorAll('.dept-section').forEach(s => {
+    s.classList.toggle('on', s.id === 'sec-' + id);
+  });
+}
+</script>
+</body>
+</html>
